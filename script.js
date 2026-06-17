@@ -28,6 +28,7 @@ const els = {
     botChips: document.getElementById('botChips'),
     playerChips: document.getElementById('playerChips'),
     message: document.getElementById('message'),
+    bestHands: document.getElementById('bestHands'),
     stage: document.getElementById('stage'),
     foldBtn: document.getElementById('foldBtn'),
     checkBtn: document.getElementById('checkBtn'),
@@ -444,6 +445,32 @@ function renderCard(card, hidden = false) {
     return div;
 }
 
+function cardToString(card) {
+    return `${card.label}${card.symbol}`;
+}
+
+function renderBestHands() {
+    els.bestHands.innerHTML = '';
+
+    if (state.stage !== 'showdown' && state.stage !== 'gameover') {
+        return;
+    }
+
+    if (state.playerCards.length && state.communityCards.length) {
+        const playerBest = evaluateBest(state.playerCards.concat(state.communityCards));
+        const playerRow = document.createElement('div');
+        playerRow.textContent = `Вы: ${labelFromScore(playerBest.score)} — ${playerBest.cards.map(cardToString).join(' ')}`;
+        els.bestHands.appendChild(playerRow);
+    }
+
+    if (state.botCards.length && state.communityCards.length) {
+        const botBest = evaluateBest(state.botCards.concat(state.communityCards));
+        const botRow = document.createElement('div');
+        botRow.textContent = `Бот: ${labelFromScore(botBest.score)} — ${botBest.cards.map(cardToString).join(' ')}`;
+        els.bestHands.appendChild(botRow);
+    }
+}
+
 function render() {
     els.botCards.innerHTML = '';
     els.playerCards.innerHTML = '';
@@ -465,6 +492,8 @@ function render() {
     els.botChips.textContent = state.botChips;
     els.playerChips.textContent = state.playerChips;
     els.message.textContent = state.message;
+    els.bestHands.innerHTML = '';
+    renderBestHands();
     els.stage.textContent = state.stage === 'preflop' ? 'Префлоп' :
         state.stage === 'flop' ? 'Флоп' :
         state.stage === 'turn' ? 'Тёрн' :

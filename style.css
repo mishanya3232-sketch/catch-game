@@ -124,6 +124,19 @@ p {
     color: #cbd5e1;
     font-size: 15px;
 }
+.best-hands {
+    width: min(100%, 420px);
+    background: rgba(0,0,0,0.38);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 12px;
+    padding: 10px 14px;
+    color: #e5e7eb;
+    font-size: 14px;
+    line-height: 1.45;
+}
+.best-hands div {
+    margin: 4px 0;
+}
 .actions {
     display: flex;
     justify-content: center;
