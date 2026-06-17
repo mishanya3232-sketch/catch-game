@@ -103,7 +103,10 @@ function canBotAct() {
 
 function fold() {
     if (!canPlayerAct()) return;
-    endHand('Вы сдались. Бот забрал банк.');
+    awardPot('bot');
+    state.stage = 'gameover';
+    state.message = 'Вы сдались. Бот забрал банк.';
+    render();
 }
 
 function checkCall() {
@@ -168,7 +171,10 @@ function botAct() {
         const strength = estimateBotStrength();
 
         if (strength < 0.25 && need > state.pot * 0.7 && Math.random() < 0.6) {
-            endHand('Бот сбросил. Вы забрали банк.');
+            awardPot('player');
+            state.stage = 'gameover';
+            state.message = 'Бот сбросил. Вы забрали банк.';
+            render();
             return;
         }
 
@@ -281,9 +287,27 @@ function endHand(message) {
     render();
 }
 
+function awardPot(winner) {
+    const pot = state.pot;
+    state.pot = 0;
+
+    if (winner === 'player') {
+        state.playerChips += pot;
+    } else {
+        state.botChips += pot;
+    }
+}
+
 function estimateBotStrength() {
     const visible = state.botCards.concat(state.communityCards);
+
+    if (visible.length < 5) {
+        return estimatePreflopStrength(state.botCards);
+    }
+
     const score = evaluateBest(visible).score;
+    if (!score) return 0.5;
+
     const category = score[0];
     if (category >= 2) return 0.85;
     if (category === 1) return 0.62;
@@ -294,6 +318,23 @@ function estimateBotStrength() {
         return 0.28;
     }
     return 0.5;
+}
+
+function estimatePreflopStrength(hand) {
+    if (!hand || hand.length < 2) return 0.35;
+
+    const ranks = hand.map(card => card.rank).sort((a, b) => b - a);
+    const suited = hand[0].suit === hand[1].suit;
+    const connected = Math.abs(ranks[0] - ranks[1]) === 1;
+
+    if (ranks[0] === ranks[1]) return 0.82; // пара
+    if (ranks[0] === 14) return suited ? 0.76 : 0.70;
+    if (ranks[0] >= 13 && ranks[1] >= 12) return suited ? 0.68 : 0.62;
+    if (ranks[0] >= 11 && ranks[1] >= 10) return suited ? 0.60 : 0.54;
+    if (connected && ranks[1] >= 8) return suited ? 0.58 : 0.50;
+    if (suited) return 0.46;
+
+    return 0.35;
 }
 
 function evaluateBest(cards) {
