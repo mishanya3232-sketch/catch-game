@@ -367,7 +367,7 @@ function scoreHand(cards) {
         return [1, pairRank, ...kickers];
     }
 
-    return [0, ...ranks];
+    return [0, ...ranks.slice(0, 5)];
 }
 
 function getStraightHigh(uniqueRanks) {
