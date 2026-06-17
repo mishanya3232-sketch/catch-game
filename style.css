@@ -4,41 +4,190 @@
     box-sizing: border-box;
 }
 body {
-    background: #1e1e1e;
+    background: #111827;
     color: #fff;
     font-family: Arial, sans-serif;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    min-height: 100vh;
-    padding-top: 20px;
-    overflow: hidden;
+    padding: 20px;
 }
-#game-container {
-    position: relative;
+.game {
     width: 100%;
-    max-width: 480px;
+    max-width: 900px;
 }
-#gameCanvas {
-    background: #2b2b2b;
-    display: block;
-    margin: 0 auto;
-    border: 2px solid #555;
-    border-radius: 8px;
-}
-#ui {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: rgba(0,0,0,0.5);
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 16px;
+.header {
     display: flex;
-    gap: 20px;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
 }
-#ui div {
+h1 {
+    font-size: 28px;
+    margin-bottom: 4px;
+}
+p {
+    color: #cbd5e1;
+}
+.table {
+    background: radial-gradient(circle at center, #166534, #064e3b);
+    border: 6px solid #7c2d12;
+    border-radius: 28px;
+    padding: 24px;
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 18px;
+    box-shadow: inset 0 0 80px rgba(0,0,0,0.35), 0 12px 32px rgba(0,0,0,0.35);
+}
+.bot-area,
+.player-area,
+.center-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.label {
+    color: #fde68a;
+    font-weight: bold;
+    font-size: 18px;
+}
+.chips {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-weight: bold;
+}
+.cards {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.community {
+    min-height: 92px;
+}
+.card {
+    width: 62px;
+    height: 88px;
+    background: #fff;
+    color: #111827;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.28);
+    border: 1px solid rgba(0,0,0,0.12);
+}
+.card.red {
+    color: #dc2626;
+}
+.card.hidden {
+    background: linear-gradient(135deg, #1e3a8a, #111827);
+    color: #fff;
+}
+.card .rank {
+    font-size: 22px;
+    line-height: 1;
+}
+.card .suit {
+    font-size: 26px;
+    line-height: 1.1;
+}
+.pot {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: 20px;
+    font-weight: bold;
+}
+.message {
+    background: rgba(0,0,0,0.38);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 12px;
+    padding: 10px 16px;
+    text-align: center;
+    min-height: 44px;
     display: flex;
     align-items: center;
-    gap: 6px;
+}
+.stage {
+    color: #cbd5e1;
+    font-size: 15px;
+}
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+button {
+    border: 0;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #fff;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+button:active {
+    transform: scale(0.97);
+}
+button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+.primary {
+    background: #2563eb;
+}
+.secondary {
+    background: #475569;
+}
+.danger {
+    background: #dc2626;
+}
+.rules {
+    margin-top: 16px;
+    color: #cbd5e1;
+    text-align: center;
+    line-height: 1.5;
+}
+@media (max-width: 640px) {
+    body {
+        padding: 10px;
+    }
+    h1 {
+        font-size: 24px;
+    }
+    .table {
+        padding: 16px;
+        border-radius: 20px;
+    }
+    .card {
+        width: 48px;
+        height: 68px;
+        font-size: 20px;
+        border-radius: 7px;
+    }
+    .card .rank {
+        font-size: 18px;
+    }
+    .card .suit {
+        font-size: 22px;
+    }
+    button {
+        width: 100%;
+        max-width: 260px;
+    }
 }

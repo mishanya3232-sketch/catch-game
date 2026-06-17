@@ -3,17 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MDF Ловец фасадов</title>
+    <title>Техасский покер</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="game-container">
-        <canvas id="gameCanvas"></canvas>
-        <div id="ui">
-            <div>Счёт: <span id="score">0</span></div>
-            <div>Жизни: <span id="lives">3</span></div>
-        </div>
-    </div>
+    <main class="game">
+        <header class="header">
+            <div>
+                <h1>Техасский покер</h1>
+                <p>Вы против бота</p>
+            </div>
+            <button id="newHandBtn" class="secondary">Новая раздача</button>
+        </header>
+
+        <section class="table">
+            <div class="bot-area">
+                <div class="label">Бот</div>
+                <div id="botCards" class="cards"></div>
+                <div class="chips">Фишки: <span id="botChips">1000</span></div>
+            </div>
+
+            <div class="center-area">
+                <div class="pot">Банк: <span id="pot">0</span></div>
+                <div id="communityCards" class="cards community"></div>
+                <div id="message" class="message">Нажмите «Новая раздача», чтобы начать.</div>
+                <div class="stage">Стадия: <span id="stage">—</span></div>
+            </div>
+
+            <div class="player-area">
+                <div id="playerCards" class="cards"></div>
+                <div class="label">Вы</div>
+                <div class="chips">Фишки: <span id="playerChips">1000</span></div>
+            </div>
+        </section>
+
+        <section class="actions">
+            <button id="foldBtn" class="danger">Сдаться</button>
+            <button id="checkBtn" class="primary">Чек / Колл</button>
+            <button id="raiseBtn" class="primary">Повысить</button>
+        </section>
+
+        <section class="rules">
+            <strong>Правила:</strong> 2 карты вам, 2 боту, 5 общих карт. Побеждает лучшая комбинация из 7 карт.
+        </section>
+    </main>
     <script src="script.js"></script>
 </body>
 </html>
