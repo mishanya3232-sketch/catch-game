@@ -42,7 +42,7 @@ function createDeck() {
     const deck = [];
     for (const suit of SUITS) {
         for (const rank of RANKS) {
-            deck.push({ ...rank, ...suit });
+            deck.push({ ...rank, symbol: suit.symbol, suit: suit.symbol, color: suit.color });
         }
     }
     return deck;
