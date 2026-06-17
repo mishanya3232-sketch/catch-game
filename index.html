@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catch Game</title>
+    <title>MDF Ловец фасадов</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Catch the Fruits!</h1>
-        <div class="score">Score: <span id="score">0</span></div>
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div id="ui">
+            <div>Счёт: <span id="score">0</span></div>
+            <div>Жизни: <span id="lives">3</span></div>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
