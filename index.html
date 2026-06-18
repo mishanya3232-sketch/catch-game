@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://mishanya3232-sketch.github.io; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://mishanya3232-sketch.github.io; object-src 'none'; base-uri 'self'; form-action 'self';">
     <title>Техасский покер</title>
-    <link rel="stylesheet" href="style.css?v=20260618-no-update-button">
+    <link rel="stylesheet" href="style.css?v=20260618-hand-hint">
 </head>
 <body>
     <main class="game">
@@ -33,6 +33,11 @@
 
             <div class="player-area">
                 <div id="playerCards" class="cards"></div>
+                <div id="playerHint" class="player-hint">Ваша рука: —</div>
+                <div class="win-probability">
+                    <div class="win-label">Шанс выигрыша: <span id="winChance">—</span></div>
+                    <div class="win-bar"><span id="winBar"></span></div>
+                </div>
                 <div class="label">Вы</div>
                 <div class="chips">Фишки: <span id="playerChips">1000</span></div>
             </div>
@@ -49,6 +54,6 @@
             <strong>Правила:</strong> 2 карты вам, 2 боту, 5 общих карт. Побеждает лучшая комбинация из 7 карт.
         </section>
     </main>
-    <script src="script.js?v=20260618-no-update-button"></script>
+    <script src="script.js?v=20260618-hand-hint"></script>
 </body>
 </html>

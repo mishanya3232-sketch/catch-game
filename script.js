@@ -20,7 +20,7 @@ const RANKS = [
     { rank: 14, label: 'A' },
 ];
 
-const APP_VERSION = '20260618-no-update-button-1';
+const APP_VERSION = '20260618-hand-hint-1';
 const UPDATE_URL = 'https://mishanya3232-sketch.github.io/catch-game/version.json';
 
 const els = {
@@ -32,6 +32,9 @@ const els = {
     playerChips: document.getElementById('playerChips'),
     message: document.getElementById('message'),
     bestHands: document.getElementById('bestHands'),
+    playerHint: document.getElementById('playerHint'),
+    winChance: document.getElementById('winChance'),
+    winBar: document.getElementById('winBar'),
     stage: document.getElementById('stage'),
     foldBtn: document.getElementById('foldBtn'),
     checkBtn: document.getElementById('checkBtn'),
@@ -515,6 +518,158 @@ function renderBestHands() {
     }
 }
 
+function sameCard(a, b) {
+    return a.rank === b.rank && a.suit === b.suit;
+}
+
+function describeHoleCards() {
+    if (!state.playerCards || state.playerCards.length < 2) return '—';
+
+    const [first, second] = state.playerCards;
+    const suited = first.suit === second.suit ? ' одномастные' : '';
+    const connected = Math.abs(first.rank - second.rank) === 1 ? ' связанные' : '';
+
+    if (first.rank === second.rank) {
+        return `пара ${first.label}${first.symbol}`;
+    }
+
+    return `${first.label}${first.symbol} ${second.label}${second.symbol}${suited}${connected}`;
+}
+
+function renderPlayerHint() {
+    if (!state.playerCards || state.playerCards.length === 0) {
+        els.playerHint.textContent = 'Ваша рука: —';
+        return;
+    }
+
+    if (state.stage === 'preflop') {
+        els.playerHint.textContent = `Ваши карты: ${describeHoleCards()}. Комбинация появится после 5 общих карт.`;
+        return;
+    }
+
+    const knownCards = state.playerCards.concat(state.communityCards);
+    if (knownCards.length < 5) {
+        const best = evaluateBest(knownCards);
+        if (best.score) {
+            els.playerHint.textContent = `Сейчас: ${labelFromScore(best.score)} — ${best.cards.map(cardToString).join(' ')}`;
+        } else {
+            els.playerHint.textContent = `Комбинация пока не собрана: есть ${knownCards.length} из 5 карт.`;
+        }
+        return;
+    }
+
+    const playerBest = evaluateBest(knownCards);
+    els.playerHint.textContent = `Ваша рука: ${labelFromScore(playerBest.score)} — ${playerBest.cards.map(cardToString).join(' ')}`;
+}
+
+function gameoverProbability() {
+    const message = state.message || '';
+
+    if (message.includes('Вы выиграли') || message.includes('Вы забрали') || message.includes('У бота закончились фишки')) {
+        return { percent: 100 };
+    }
+
+    if (message.includes('Бот выиграл') || message.includes('Вы сдались') || message.includes('У вас закончились фишки')) {
+        return { percent: 0 };
+    }
+
+    if (message.includes('Ничья')) {
+        return { percent: 50 };
+    }
+
+    return { percent: null };
+}
+
+function exactRiverProbability(remainingCards) {
+    let wins = 0;
+    let ties = 0;
+    let total = 0;
+    const board = state.communityCards.slice();
+
+    for (let i = 0; i < remainingCards.length; i++) {
+        for (let j = i + 1; j < remainingCards.length; j++) {
+            const botHand = [remainingCards[i], remainingCards[j]];
+            const playerScore = evaluateBest(state.playerCards.concat(board)).score;
+            const botScore = evaluateBest(botHand.concat(board)).score;
+            const cmp = compareScores(playerScore, botScore);
+
+            if (cmp > 0) wins++;
+            else if (cmp === 0) ties++;
+            total++;
+        }
+    }
+
+    if (!total) return { percent: null };
+
+    return { percent: Math.round(((wins + ties * 0.5) / total) * 100) };
+}
+
+function calculateWinProbability() {
+    if (state.stage === 'new' || !state.playerCards || state.playerCards.length === 0) {
+        return { percent: null };
+    }
+
+    if (state.stage === 'showdown') {
+        const playerScore = evaluateBest(state.playerCards.concat(state.communityCards)).score;
+        const botScore = evaluateBest(state.botCards.concat(state.communityCards)).score;
+        const cmp = compareScores(playerScore, botScore);
+
+        return { percent: cmp > 0 ? 100 : cmp < 0 ? 0 : 50 };
+    }
+
+    if (state.stage === 'gameover') {
+        return gameoverProbability();
+    }
+
+    const knownCards = state.playerCards.concat(state.communityCards);
+    const remainingCards = createDeck().filter(card => !knownCards.some(knownCard => sameCard(card, knownCard)));
+
+    if (remainingCards.length < 2) {
+        return { percent: null };
+    }
+
+    if (state.stage === 'river') {
+        return exactRiverProbability(remainingCards);
+    }
+
+    const trials = state.stage === 'preflop' ? 300 : state.stage === 'flop' ? 400 : 500;
+    let wins = 0;
+    let ties = 0;
+    const neededCommunity = 5 - state.communityCards.length;
+
+    for (let i = 0; i < trials; i++) {
+        const deck = remainingCards.slice();
+        shuffle(deck);
+
+        const botHand = [deck.pop(), deck.pop()];
+        const board = state.communityCards.slice().concat(deck.splice(0, neededCommunity));
+        const playerScore = evaluateBest(state.playerCards.concat(board)).score;
+        const botScore = evaluateBest(botHand.concat(board)).score;
+        const cmp = compareScores(playerScore, botScore);
+
+        if (cmp > 0) wins++;
+        else if (cmp === 0) ties++;
+    }
+
+    return { percent: Math.round(((wins + ties * 0.5) / trials) * 100) };
+}
+
+function renderWinProbability() {
+    const probability = calculateWinProbability();
+
+    if (probability.percent === null) {
+        els.winChance.textContent = '—';
+        els.winBar.style.width = '10%';
+        els.winBar.style.background = '#64748b';
+        return;
+    }
+
+    const percent = Math.max(0, Math.min(100, probability.percent));
+    els.winChance.textContent = `примерно ${percent}%`;
+    els.winBar.style.width = `${Math.max(8, percent)}%`;
+    els.winBar.style.background = percent >= 60 ? '#22c55e' : percent >= 40 ? '#f59e0b' : '#ef4444';
+}
+
 async function checkForUpdate() {
     try {
         const response = await fetch(`${UPDATE_URL}?current=${encodeURIComponent(APP_VERSION)}&t=${Date.now()}`, { cache: 'no-store' });
@@ -553,6 +708,8 @@ function render() {
     els.message.textContent = state.message;
     els.bestHands.innerHTML = '';
     renderBestHands();
+    renderPlayerHint();
+    renderWinProbability();
     els.stage.textContent = state.stage === 'preflop' ? 'Префлоп' :
         state.stage === 'flop' ? 'Флоп' :
         state.stage === 'turn' ? 'Тёрн' :
