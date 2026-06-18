@@ -20,6 +20,9 @@ const RANKS = [
     { rank: 14, label: 'A' },
 ];
 
+const APP_VERSION = '20260617-update-check-1';
+const UPDATE_URL = 'https://mishanya3232-sketch.github.io/catch-game/version.json';
+
 const els = {
     botCards: document.getElementById('botCards'),
     playerCards: document.getElementById('playerCards'),
@@ -33,6 +36,7 @@ const els = {
     foldBtn: document.getElementById('foldBtn'),
     checkBtn: document.getElementById('checkBtn'),
     raiseBtn: document.getElementById('raiseBtn'),
+    updateBtn: document.getElementById('updateBtn'),
     newHandBtn: document.getElementById('newHandBtn'),
 };
 
@@ -512,6 +516,25 @@ function renderBestHands() {
     }
 }
 
+async function checkForUpdate() {
+    try {
+        const response = await fetch(`${UPDATE_URL}?current=${encodeURIComponent(APP_VERSION)}&t=${Date.now()}`, { cache: 'no-store' });
+        const data = await response.json();
+
+        if (data.version && data.version !== APP_VERSION) {
+            const message = data.message || `Доступна версия ${data.version}.`;
+            state.message = `${message} Нажмите «Обновить» для скачивания.`;
+            render();
+        }
+    } catch (error) {
+        // Обновление проверяется тихо: если интернета нет, игра продолжает работать.
+    }
+}
+
+function applyUpdate() {
+    window.location.href = 'https://mishanya3232-sketch.github.io/catch-game/android/poker-debug.apk';
+}
+
 function render() {
     els.botCards.innerHTML = '';
     els.playerCards.innerHTML = '';
@@ -548,12 +571,14 @@ function render() {
     els.raiseBtn.disabled = !playerCanAct || state.playerChips <= 0;
     els.checkBtn.textContent = state.currentBet > state.playerBet ? 'Колл' : 'Чек';
     els.newHandBtn.disabled = false;
+    els.updateBtn.disabled = false;
 }
 
 els.foldBtn.addEventListener('click', fold);
 els.checkBtn.addEventListener('click', checkCall);
 els.raiseBtn.addEventListener('click', raise);
 els.newHandBtn.addEventListener('click', newHand);
+els.updateBtn.addEventListener('click', applyUpdate);
 
 state = {
     deck: [],
@@ -572,3 +597,4 @@ state = {
 };
 
 render();
+checkForUpdate();
