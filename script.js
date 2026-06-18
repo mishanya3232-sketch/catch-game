@@ -20,7 +20,8 @@ const RANKS = [
     { rank: 14, label: 'A' },
 ];
 
-const APP_VERSION = '20260618-hand-hint-1';
+const APP_VERSION = '20260618-gameover-reset-1';
+const START_CHIPS = 1000;
 const UPDATE_URL = 'https://mishanya3232-sketch.github.io/catch-game/version.json';
 
 const els = {
@@ -66,6 +67,13 @@ function deal() {
 }
 
 function newHand() {
+    const matchWasOver = state.stage === 'gameover' && (state.playerChips <= 0 || state.botChips <= 0);
+
+    if (matchWasOver) {
+        state.playerChips = START_CHIPS;
+        state.botChips = START_CHIPS;
+    }
+
     if (state.playerChips <= 0 || state.botChips <= 0) {
         state.stage = 'gameover';
         state.message = state.playerChips <= 0 ? 'У вас закончились фишки. Бот победил.' : 'У бота закончились фишки. Вы победили.';
@@ -94,7 +102,7 @@ function newHand() {
     state.playerBet = playerBlind;
     state.botBet = botBlind;
     state.currentBet = botBlind;
-    state.message = 'Ваш ход. Бот поставил большой блайнд.';
+    state.message = matchWasOver ? 'Фишки сброшены: новая игра началась. Бот поставил большой блайнд.' : 'Ваш ход. Бот поставил большой блайнд.';
 
     render();
 }
@@ -737,8 +745,8 @@ state = {
     communityCards: [],
     stage: 'new',
     pot: 0,
-    playerChips: 1000,
-    botChips: 1000,
+    playerChips: START_CHIPS,
+    botChips: START_CHIPS,
     playerBet: 0,
     botBet: 0,
     currentBet: 0,
