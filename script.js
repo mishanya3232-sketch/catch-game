@@ -20,7 +20,7 @@ const RANKS = [
     { rank: 14, label: 'A' },
 ];
 
-const APP_VERSION = '20260617-update-check-1';
+const APP_VERSION = '20260618-no-update-button-1';
 const UPDATE_URL = 'https://mishanya3232-sketch.github.io/catch-game/version.json';
 
 const els = {
@@ -36,7 +36,6 @@ const els = {
     foldBtn: document.getElementById('foldBtn'),
     checkBtn: document.getElementById('checkBtn'),
     raiseBtn: document.getElementById('raiseBtn'),
-    updateBtn: document.getElementById('updateBtn'),
     newHandBtn: document.getElementById('newHandBtn'),
 };
 
@@ -523,16 +522,12 @@ async function checkForUpdate() {
 
         if (data.version && data.version !== APP_VERSION) {
             const message = data.message || `Доступна версия ${data.version}.`;
-            state.message = `${message} Нажмите «Обновить» для скачивания.`;
+            state.message = `${message} Кнопка обновления скрыта: скачайте новый APK с сайта.`;
             render();
         }
     } catch (error) {
         // Обновление проверяется тихо: если интернета нет, игра продолжает работать.
     }
-}
-
-function applyUpdate() {
-    window.location.href = 'https://mishanya3232-sketch.github.io/catch-game/android/poker-debug.apk';
 }
 
 function render() {
@@ -571,14 +566,12 @@ function render() {
     els.raiseBtn.disabled = !playerCanAct || state.playerChips <= 0;
     els.checkBtn.textContent = state.currentBet > state.playerBet ? 'Колл' : 'Чек';
     els.newHandBtn.disabled = false;
-    els.updateBtn.disabled = false;
 }
 
 els.foldBtn.addEventListener('click', fold);
 els.checkBtn.addEventListener('click', checkCall);
 els.raiseBtn.addEventListener('click', raise);
 els.newHandBtn.addEventListener('click', newHand);
-els.updateBtn.addEventListener('click', applyUpdate);
 
 state = {
     deck: [],
